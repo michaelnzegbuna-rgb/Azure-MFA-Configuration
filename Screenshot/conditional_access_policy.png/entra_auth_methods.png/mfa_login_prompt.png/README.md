@@ -42,6 +42,7 @@ Below are key verification screenshots demonstrating the configuration and login
 
 ### 1. Entra ID Authentication Methods
 The central policies page showing the tenant's permitted authentication methods, ensuring SMS is restricted and passwordless/push methods are prioritized.
+![Uploading entra_auth_methods.png…]()
 
 ![Microsoft Entra ID Authentication Methods Policies](./screenshots/entra_auth_methods.png)
 
