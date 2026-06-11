@@ -6,7 +6,7 @@ This report documents the step-by-step administrative actions taken within the M
 
 ## ⚙️ Step 1: Navigating to the Entra ID Interface
 1.  Open a browser and navigate to the **Microsoft Entra admin center** (`https://entra.microsoft.com`).
-2.  Sign in using the tenant administrator account **nmichaelnzegbuna@nzemikez.nzecrosoft.com**.
+2.  Sign in using the tenant administrator account **michaelnzegbuna@nzemikez.nzecrosoft.com**.
 3.  On the left navigation pane, expand the **Identity** menu to expose user management, groups, and security settings.
 
 ---
