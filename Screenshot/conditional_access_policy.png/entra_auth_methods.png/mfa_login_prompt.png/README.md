@@ -57,11 +57,13 @@ A granular Conditional Access policy configured to prompt for MFA whenever a use
 The end-user configuration portal (`mysignins.microsoft.com`) verifying successful registration of secondary factors (Microsoft Authenticator App on iPhone 12 Pro).
 
 ![End-User Security Info Dashboard](./screenshots/user_mfa_registration.png)
+<img width="1917" height="1016" alt="user_mfa_registration" src="https://github.com/user-attachments/assets/49feec75-c81e-4938-8677-534dde231b59" />
 
 ### 4. Verification Prompt During Registration
 The setup verification flow displaying the "Let's try it out" screen with the verification code (64) during Microsoft Authenticator onboarding.
 
 ![MFA Number Matching Onboarding Prompt](./screenshots/mfa_login_prompt.png)
+<img width="1918" height="1022" alt="mfa_login_prompt" src="https://github.com/user-attachments/assets/9bae1a6a-cb62-426e-a1ac-3e05d97a50ab" />
 
 ---
 
