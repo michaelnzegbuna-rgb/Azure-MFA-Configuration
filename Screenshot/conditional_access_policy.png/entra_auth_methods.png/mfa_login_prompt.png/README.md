@@ -42,9 +42,10 @@ Below are key verification screenshots demonstrating the configuration and login
 
 ### 1. Entra ID Authentication Methods
 The central policies page showing the tenant's permitted authentication methods, ensuring SMS is restricted and passwordless/push methods are prioritized.
-![Uploading entra_auth_methods.png…]()
+
 
 ![Microsoft Entra ID Authentication Methods Policies](./screenshots/entra_auth_methods.png)
+<img width="1908" height="976" alt="entra_auth_methods" src="https://github.com/user-attachments/assets/d5f72edb-f2aa-4bb9-a77f-96094bdc7747" />
 
 ### 2. Conditional Access Policy Design
 A granular Conditional Access policy configured to prompt for MFA whenever a user attempts to access any cloud resource from external networks or with administrative roles.
