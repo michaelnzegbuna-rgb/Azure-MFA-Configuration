@@ -51,6 +51,7 @@ The central policies page showing the tenant's permitted authentication methods,
 A granular Conditional Access policy configured to prompt for MFA whenever a user attempts to access any cloud resource from external networks or with administrative roles.
 
 ![Conditional Access Policy UI](./screenshots/conditional_access_policy.png)
+<img width="1912" height="1020" alt="conditional_access_policy" src="https://github.com/user-attachments/assets/2e6fc56b-0a5f-48e7-bc84-adef2fd92408" />
 
 ### 3. User Self-Service Security Registration
 The end-user configuration portal (`mysignins.microsoft.com`) verifying successful registration of secondary factors (Microsoft Authenticator App on iPhone 12 Pro).
