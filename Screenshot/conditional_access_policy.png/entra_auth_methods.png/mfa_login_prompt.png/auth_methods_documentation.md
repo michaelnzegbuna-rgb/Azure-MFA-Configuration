@@ -1,84 +1,176 @@
-# Authentication Methods & Justifications
+# Authentication Strategy Evaluation for Microsoft Entra ID
 
-This document provides a detailed overview of the authentication methods enabled in the Microsoft Entra ID tenant. It evaluates each method against the criteria of **Security** (resilience to attacks) and **Usability** (friction, onboarding ease), justifying their role in our Zero Trust identity architecture.
+## Introduction
 
----
+This document examines the authentication methods enabled within the Microsoft Entra ID environment and explains the rationale behind each selection. Every method is assessed using two primary factors:
 
-## 📊 Summary Matrix
+* **Security Strength** – the level of protection provided against modern cyber threats.
+* **User Experience** – the ease and convenience of the authentication process for end users.
 
-| Authentication Method | Security Level | Usability Level | Primary Attack Vector Vulnerability | Best Used For |
-| :--- | :--- | :--- | :--- | :--- |
-| **Microsoft Authenticator (Push + Number Match)** | High | High | Device compromise, session hijacking | General employees, standard operations |
-| **Passkey (FIDO2) / Security Keys** | Critical | Medium-Low | Physical key theft | Privileged accounts, system administrators |
-| **Temporary Access Pass (TAP)** | High | Medium | Passcode theft / social engineering | User onboarding, passwordless registration |
-| **Software OATH Tokens** | Medium | High | Phishing, device compromise | Third-party authenticators, backup access |
-| **SMS Verification** | Low-Medium | High | SIM swapping, phishing, interception | Secondary backup, remote fallback |
-| **Email OTP** | Low | High | Mailbox compromise, phishing | External collaboration, guest user fallback |
+The chosen authentication portfolio supports a Zero Trust security model by balancing strong identity protection with practical usability requirements.
 
 ---
 
-## 📱 1. Microsoft Authenticator App (Push Notifications & OTP)
+## Authentication Methods Summary
 
-The Microsoft Authenticator App is the recommended primary authentication method for general users.
-
-### Security Assessment:
-*   **MFA Fatigue Mitigation**: Enforces **number-matching** (verified during setup with code **64**). This requires the user to type a 2-digit code shown on the login screen into their phone, preventing "push bombing" where users blindly click "Approve" due to receiving multiple notifications.
-*   **Contextual Awareness**: Displays the application name and geographic location of the login request, allowing users to recognize unauthorized login attempts immediately.
-*   **Phishing Resistance**: Highly resistant to standard credential phishing, though still vulnerable to advanced proxy-based phishing (e.g., AitM - Adversary-in-the-Middle) unless configured with device-binding.
-
-### Usability Assessment:
-*   **Minimal Friction**: Approval requires a simple push notification response, reducing manual verification code typing.
-*   **Offline Functionality**: If mobile data is unavailable, the app generates a time-based One-Time Passcode (TOTP) every 30 seconds that can be typed in manually.
-*   **App Dependency**: Requires users to install a corporate application on their mobile devices, which can sometimes raise personal privacy concerns for employees.
+| Authentication Method                                        | Security Rating | User Experience | Primary Limitation                        | Recommended Use Case                        |
+| ------------------------------------------------------------ | --------------- | --------------- | ----------------------------------------- | ------------------------------------------- |
+| Microsoft Authenticator (Push Approval with Number Matching) | High            | High            | Mobile device compromise or session theft | Standard workforce authentication           |
+| FIDO2 Security Keys / Passkeys                               | Very High       | Medium          | Loss or theft of the hardware token       | Privileged and administrative accounts      |
+| Temporary Access Pass (TAP)                                  | High            | Medium          | Potential social engineering risks        | User onboarding and passwordless enrollment |
+| Software OATH Tokens                                         | Moderate        | High            | Vulnerable to phishing attacks            | Alternative authenticator applications      |
+| SMS-Based Authentication                                     | Low to Moderate | High            | SIM-swap and interception attacks         | Emergency backup authentication             |
+| Email One-Time Passcodes                                     | Low             | High            | Dependence on email account security      | External users and guest access             |
 
 ---
 
-## 🔑 2. Passkey (FIDO2 Security Keys)
+# Microsoft Authenticator
 
-FIDO2 Security keys (such as YubiKeys) and platform passkeys (Windows Hello, Apple FaceID/TouchID) utilize cryptography to provide passwordless, phishing-resistant authentication.
+## Purpose and Security Benefits
 
-### Security Assessment:
-*   **Phishing Resistant**: FIDO2 authentication is cryptographically bound to the specific domain (e.g., `login.microsoftonline.com`). If a user is tricked into visiting a fake login page, the hardware key or passkey will refuse to authenticate because the domain name does not match, completely neutralizing Adversary-in-the-Middle (AitM) phishing attacks.
-*   **No Shared Secret**: Cryptographic keys remain stored on the physical device or platform secure enclave, preventing server-side credential theft.
-*   **Zero Trust Alignment**: Represents the gold standard of the Zero Trust model (Verify Explicitly) by validating hardware possession.
+Microsoft Authenticator serves as the primary authentication method for most users across the organization.
 
-### Usability Assessment:
-*   **Hardware / Platform Overhead**: Requires distributing physical keys or ensuring that users are on compatible devices with local biometrics.
-*   **Friction**: High initial enrollment setup friction, but very low day-to-day login friction (simple tap of the physical key or biometric verification).
+One of its strongest security enhancements is the implementation of **number matching**, which was successfully validated during testing. Rather than approving sign-in requests with a single tap, users must enter a code displayed on the sign-in screen. This additional verification step significantly reduces the effectiveness of MFA fatigue attacks and unsolicited approval requests.
 
----
+The application also provides contextual information during authentication, including:
 
-## 🎫 3. Temporary Access Pass (TAP)
+* The application requesting access
+* Geographic location information
+* Sign-in details
 
-A Temporary Access Pass is a time-limited passcode configured by an administrator that acts as a strong single-use credential.
+These indicators help users identify suspicious login attempts before granting approval.
 
-### Security Assessment:
-*   **Onboarding Security**: Replaces the insecure practice of sending temporary clear-text passwords to new employees.
-*   **Bootstrap Factor**: Allows new users to complete their initial passwordless registration (such as registering FIDO2 keys or Microsoft Authenticator) without ever creating or typing a traditional password.
+Although the solution offers strong protection against conventional phishing campaigns, advanced adversary-in-the-middle attacks may still succeed if additional protections such as device binding are not implemented.
 
-### Usability Assessment:
-*   **Limited Lifetime**: Automatically expires after a configured duration (e.g., 1 hour to 24 hours), reducing the risk window if intercepted.
+## User Experience Considerations
+
+From a usability perspective, push notifications provide a fast and intuitive sign-in experience. In situations where internet connectivity is unavailable, the application can generate time-based one-time passwords (TOTP) that allow offline authentication.
+
+The primary challenge is user acceptance, as some individuals may be reluctant to install corporate authentication software on personal devices.
 
 ---
 
-## 💬 4. SMS Verification (Short Message Service)
+# FIDO2 Security Keys and Passkeys
 
-SMS sends a temporary 6-digit passcode to the user's registered cellular phone number.
+## Purpose and Security Benefits
 
-### Security Assessment:
-*   **Low Security (Weakest Factor)**: Vulnerable to **SIM Swapping** attacks, where attackers impersonate the victim to transfer their cell service to a hacker-controlled SIM card.
-*   **Interception Risk**: SMS messages travel over unencrypted cellular networks, making them vulnerable to SS7 interception and base station spoofing.
-*   **Phishing Susceptibility**: Users are highly accustomed to typing 6-digit codes into forms, making them easy targets for basic phishing pages that harvest and replay the codes.
+Passkeys and FIDO2 security keys represent the most secure authentication option available within the environment.
 
-### Usability Assessment:
-*   **Ubiquity**: Requires no application installs or special hardware; works on any mobile phone globally.
-*   **Fallback Justification**: Despite security flaws, SMS is enabled solely as a secondary fallback method to prevent lockouts during device transitions or travel where internet connectivity is limited.
+Unlike traditional authentication methods, they rely on public-key cryptography rather than shared secrets. Authentication is cryptographically bound to the legitimate website domain, preventing credentials from being used on fraudulent or phishing websites.
+
+Additional security advantages include:
+
+* Resistance to phishing attacks
+* Protection against adversary-in-the-middle attacks
+* Private keys never leave the user's device
+* Hardware-backed identity verification
+
+Within a Zero Trust architecture, this method provides strong proof of user identity through possession of a trusted device.
+
+## User Experience Considerations
+
+Deployment requires either dedicated hardware tokens or devices equipped with biometric capabilities such as:
+
+* Windows Hello
+* Face ID
+* Touch ID
+
+Although initial enrollment requires additional effort, daily authentication is extremely fast and convenient once configured.
 
 ---
 
-## 🎯 Architectural Justification
+# Temporary Access Pass (TAP)
 
-1.  **Defense in Depth**: We enforce a multi-tier authentication model. While standard business users utilize the Authenticator App, all **Global Administrators** and high-risk accounts are restricted to phishing-resistant **FIDO2 security keys**.
-2.  **Zero Trust Framework**: Every login attempt is verified explicitly using real-time policy evaluation. We mandate Microsoft Authenticator because it feeds device compliance and location signals directly into Entra ID's risk-detection engine.
-3.  **MFA Fatigue Controls**: Enforcing number-matching prevents the most common social engineering bypasses, ensuring that authentication remains active and deliberate.
+## Purpose and Security Benefits
 
+Temporary Access Passes provide a secure method for onboarding users into passwordless authentication environments.
+
+Rather than distributing temporary passwords through email or other insecure channels, administrators generate a short-term passcode that enables users to register stronger authentication methods such as:
+
+* Microsoft Authenticator
+* FIDO2 Security Keys
+* Passkeys
+
+This approach reduces the organization's dependence on traditional passwords and improves overall credential security.
+
+## User Experience Considerations
+
+TAP codes are intentionally short-lived and expire automatically after a predefined period. This minimizes risk if a passcode is intercepted while still providing sufficient time for enrollment activities.
+
+---
+
+# SMS Authentication
+
+## Purpose and Security Benefits
+
+SMS-based authentication delivers a one-time verification code to a registered mobile phone number.
+
+While still widely used, SMS is considered one of the weaker multifactor authentication methods available today due to several known attack vectors, including:
+
+* SIM swapping
+* Mobile carrier compromise
+* SS7 protocol exploitation
+* Phishing attacks targeting verification codes
+
+Because SMS codes can be intercepted or relayed, they do not provide the same level of protection as modern passwordless solutions.
+
+## User Experience Considerations
+
+Despite its security limitations, SMS remains highly accessible because it requires no additional applications, hardware devices, or internet connectivity.
+
+For this reason, it is retained as a secondary recovery mechanism rather than a primary authentication method.
+
+---
+
+# Building a Layered Authentication Strategy
+
+## Security Architecture Approach
+
+The authentication design follows a layered security model where different authentication methods are assigned according to user risk levels.
+
+### Standard Users
+
+Most employees authenticate using Microsoft Authenticator because it provides a strong balance between protection and convenience.
+
+### Privileged Accounts
+
+Administrative accounts require stronger controls and therefore utilize FIDO2 security keys or passkeys due to their superior resistance to phishing attacks.
+
+### User Enrollment
+
+Temporary Access Passes streamline secure onboarding while eliminating the need for temporary passwords.
+
+### Backup Authentication
+
+SMS and email-based verification remain available as contingency methods for account recovery and exceptional access scenarios.
+
+---
+
+# Alignment with Zero Trust Principles
+
+The selected authentication methods support key Zero Trust concepts:
+
+### Continuous Verification
+
+Every authentication request is evaluated independently rather than automatically trusted.
+
+### Risk-Based Decision Making
+
+Sign-in events are assessed using contextual signals such as:
+
+* Device compliance status
+* User location
+* Sign-in behavior
+* Risk indicators generated by Microsoft Entra ID
+
+### Human-Centered Security Controls
+
+Features such as number matching are specifically designed to reduce user error and prevent social engineering attacks by requiring deliberate user interaction during authentication.
+
+---
+
+# Final Assessment
+
+The implemented authentication strategy combines multiple layers of identity protection while maintaining an acceptable user experience. Microsoft Authenticator serves as the primary authentication method for general users, FIDO2 security keys provide maximum protection for privileged accounts, and Temporary Access Passes support secure passwordless onboarding.
+
+Together, these methods establish a resilient identity security framework that aligns with modern Zero Trust principles and significantly strengthens protection against credential theft, phishing, and unauthorized access attempts.
