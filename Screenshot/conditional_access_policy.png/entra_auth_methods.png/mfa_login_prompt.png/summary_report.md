@@ -6,7 +6,7 @@ This report documents the step-by-step administrative actions taken within the M
 
 ## ⚙️ Step 1: Navigating to the Entra ID Interface
 1.  Open a browser and navigate to the **Microsoft Entra admin center** (`https://entra.microsoft.com`).
-2.  Sign in using the tenant administrator account **michaelnzegbuna@nzemikez.nzecrosoft.com**.
+2.  Sign in using the tenant administrator account **michaelnzegbuna@nzemikez.onmicrosoft.com**.
 3.  On the left navigation pane, expand the **Identity** menu to expose user management, groups, and security settings.
 
 ---
@@ -31,7 +31,7 @@ To verify the registration and login flows, a dedicated test user account was cr
 
 1.  Navigate to **Identity** > **Users** > **All users** > **New user** > **Create new user**.
 2.  Configure the following attributes:
-    *   **User principal name**: `testusermfa@olamc.onmicrosoft.com`
+    *   **User principal name**: `testusermfa@nzemikez.onmicrosoft.com`
     *   **Display name**: test userMFA
     *   **Password**: Auto-generated (copied for initial login).
     *   **Usage location**: United States (critical for license and policy assignment).
@@ -46,7 +46,7 @@ Rather than relying on legacy per-user MFA (which is static and disruptive), we 
 1.  Navigate to **Identity** > **Protection** > **Conditional Access** > **Policies**.
 2.  Click **New policy** and name it `CA001: Enforce MFA`.
 3.  Under **Assignments**:
-    *   **Users or agents**: Click *Specific users included* and select our test user `testusermfa@olamc.onmicrosoft.com`.
+    *   **Users or agents**: Click *Specific users included* and select our test user `testusermfa@nzemikez.onmicrosoft.com`.
     *   **Target resources**: Select **All resources (formerly 'All cloud apps')**.
 4.  Under **Access controls** > **Grant**:
     *   Select **Grant access**.
@@ -58,7 +58,7 @@ Rather than relying on legacy per-user MFA (which is static and disruptive), we 
 
 ## 📝 Step 5: Testing User Onboarding & Enrollment
 1.  Open an Incognito browser session and navigate to the security registration page (`https://mysignins.microsoft.com/security-info`).
-2.  Log in as `testusermfa@olamc.onmicrosoft.com` using the temporary password.
+2.  Log in as `testusermfa@nzemikez.onmicrosoft.com` using the temporary password.
 3.  The portal prompts the user with: **"More information required. Your organization needs more information to keep your account secure."**
 4.  Click **Next**. The browser redirects to the Microsoft Authenticator setup wizard:
     *   Select **Microsoft Authenticator** as the primary method.
